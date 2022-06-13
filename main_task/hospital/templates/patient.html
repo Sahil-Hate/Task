@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <style>
+
+        .row{
+            display: flex;
+            justify-content: center;
+        }
+
+        .button{
+            padding: 0px 10px;
+        }
+    </style>
+
+    <title>Dr. Page</title>
+</head>
+<body>
+    
+    <div class="container">
+        <div class="jumbotron text-center">
+            {% if patient %}
+                <h1 class="text-primary">Welcome Mr. {{username}}!</h1>
+            {% else %}
+                <h1 class="text-primary">Login or Signup to Continue!</h1>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row text-center">
+            {% if patient %}
+            <div class="button">
+                <a href="{%url 'readblog' %}" class="btn btn-info">Read Blog</a>
+            </div>
+
+            <div class="button">
+                <a href="{% url 'logout' %}" class="btn btn-info">Logout</a>
+            </div>
+
+            {%else%}
+            <div class="button">
+                <a href="{%url 'patient_signup' %}" class="btn btn-info">Sign Up</a>
+            </div>
+            <div class="button">
+                <a href="{% url 'patient_login' %}" class="btn btn-info">Login</a>
+            </div>
+            {%endif%}
+        </div>
+    </div>
+
+</body>
+</html>

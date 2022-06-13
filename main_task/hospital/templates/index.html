@@ -32,7 +32,8 @@
     <script src="https://kit.fontawesome.com/db71ca3f4b.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-
+    <style>         
+    </style>         
    <!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
         <script src="js/html5shiv.js"></script>
@@ -52,27 +53,11 @@
 								<span class="icon-bar"></span>
 								<span class="icon-bar"></span>
 							</button>
-                            <!--Start Logo -->
-							<div class="logo-nav">
-								<a href="{% url 'index' %}">
-									<img src="{% static 'images/hps.jpg' %}" alt="Company logo" style="width: 5%;height:auto;margin-top:1%" />
-								</a>
-							</div>
-                            <!--End Logo -->
+
 							<div class="clear-toggle"></div>
 							<div id="main-menu" class="collapse scroll navbar-right">
 								<ul class="nav">
-                                
 									<li class="active"> <a href="#home">Home</a> </li>
-                                   
-								    <li> <a href="{% url 'patient_signup'%}">Patient Signup</a> </li>
-																		
-									<li> <a href="{% url 'dr_signup'%}">Dr. Signup</a></li>
-                                     
-									<li> <a href="{% url 'login'%}">LOGIN</a> </li>
-
-                                    <li> <a href="{% url 'logout'%}">LOGOUT</a> </li>
-										
 								</ul>
 							</div><!-- end main-menu -->
 						</div>
@@ -92,7 +77,7 @@
                             <div class="container">
                                 <div class="big">Fighting Poverty Together</div>          
                                 <div class="small">Are you wiling to fight poverty?</div>
-                                <a href="{% url 'login'%}" class="middle btn btn-white" style="z-index:100;">LOGIN</a>
+                                <a href="" class="middle btn btn-white" style="z-index:100;">LOGIN</a>
                             </div>       
                         </div>
                         <img src="{% static 'images/hps.jpg' %}" alt="">
@@ -101,43 +86,40 @@
             </div>
         </section>
           <!-- End Slider  -->
+    <br><br>
+   <!--Types of users-->
+   <div class="container">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="card" style="width: 18rem;">
+                    <img src="{% static 'images/admin.jpg' %}" class="card-img-top" alt="...">
+                    <div class="card-body"><br>
+                    <a href="{% url 'admin:index' %}" class="btn btn-primary">Admin</a>
+                    </div>
+                </div>
+            </div>
 
+            <div class="col-sm-4">
+                <div class="card" style="width: 18rem;">
+                    <img src="{% static 'images/dr.jpg' %}" class="card-img-top" alt="..." style="height:20px, width:auto">
+                    <div class="card-body"><br>
+                    <a href="{% url 'doctor' %}" class="btn btn-primary">Doctor</a>
+                    </div>
+                </div>
+            </div>
 
-  <!--Start Features-->
-  <section  id="about" class="section">
-       <div class="container">
-           <div class="row">
-            <div class="title-box text-center">
-                <h2 class="title">DETAILS</h2>
-             </div>
-              <!-- Features Icon-->
-              <div class="col-md-4">
-                  <div class="features-icon-box">
-                  
-                      <div class="features-icon">
-                        <a href=""><i class="fa fa-user fa-lg"></i></a>
-                      </div>
-                      
-                      <div class="features-info">
-                        <h4>User Details</h4>
-                        {% if first_name %}
-                            <p>First Name: {{first_name}}</p>
-                            <p>Last Name: {{last_name}}</p>
-                            <p>Username: {{username}}</p>
-                            <p>Email: {{email}}</p>
-                        {% else %}
-                            <h5>Login to display the details</h5>
-                        {% endif %}
-                      </div>
-                  </div>
-              </div>
+            <div class="col-sm-4">
+                <div class="card" style="width: 18rem;">
+                    <img src="{% static 'images/pat.jpg' %}" class="card-img-top" alt="...">
+                    <div class="card-body"><br>
+                    <a href="{% url 'patient' %}" class="btn btn-primary">Patient</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-           </div> <!-- /.row-->
-       </div> <!-- /.container-->
-  </section> 
-  <!--End Features-->
-
-   
+    <br><br>
    <!--Start Footer-->
    <footer>
        <div class="container">

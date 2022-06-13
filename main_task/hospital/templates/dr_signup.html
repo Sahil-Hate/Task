@@ -105,7 +105,7 @@
     <form action="dr_signup" method="post">
 		{% csrf_token %}
 		<h2>Sign Up</h2>
-		<p>Please fill in this form to create an account!</p>
+		<p>Please fill in this form to create an dr. account!</p>
 		<hr>
 
 		<div class="form-group">
@@ -212,7 +212,7 @@
 			{%endfor%}
 		</div>
     </form>
-	<div class="text-center">Already have an account? <a href={%url 'login' %}>Login here</a></div>
+	<div class="text-center">Already have an account? <a href={%url 'dr_login' %}>Login here</a></div>
 </div>
 </body>
 </html>
