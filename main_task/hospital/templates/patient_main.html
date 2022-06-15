@@ -24,14 +24,14 @@
         }
     </style>
 
-    <title>Dr. Page</title>
+    <title>Patient Page</title>
 </head>
 <body>
     
     <div class="container">
         <div class="jumbotron text-center">
             {% if patient %}
-                <h1 class="text-primary">Welcome Mr. {{username}}!</h1>
+                <h1 class="text-primary">Welcome Mr. {{patient.first_name}}!</h1>
             {% else %}
                 <h1 class="text-primary">Login or Signup to Continue!</h1>
             {% endif %}
@@ -50,17 +50,10 @@
             </div>
 
             <div class="button">
-                <a href="{% url 'doctorlist' %}" class="btn btn-info">Doctors</a>
+                <a href="{% url 'doctorlist' patient.username %}" class="btn btn-info">Doctors</a>
             </div>
 
-            {%else%}
-            <div class="button">
-                <a href="{%url 'patient_signup' %}" class="btn btn-info">Sign Up</a>
-            </div>
-            <div class="button">
-                <a href="{% url 'patient_login' %}" class="btn btn-info">Login</a>
-            </div>
-            {%endif%}
+            {% endif %}
         </div>
     </div>
 

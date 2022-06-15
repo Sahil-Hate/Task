@@ -13,7 +13,11 @@ urlpatterns = [
     path("patient_signup",views.patient_signup,name='patient_signup'),
     path("doctor",views.doctor,name='doctor'),
     path("doctor_main/<int:id>/",views.doctor_main,name='doctor_main'),
+    path("patient_main/<int:id>/",views.patient_main,name='patient_main'),
     path("addblog/<int:id>/",views.addblog,name='addblog'),
     path("draftblog/<int:id>/",views.draftblog,name='draftblog'),
     path("readblog",views.readblog,name='readblog'),
+    path("doctorlist/<str:user>/",views.doctorlist,name='doctorlist'),
+    path("bookdoctor/<str:user>/<int:id>/",views.bookdoctor,name='bookdoctor'),
+    path("confirmation/<str:user>/<int:id>/",views.confirmation,name='confirmation'),
 ]

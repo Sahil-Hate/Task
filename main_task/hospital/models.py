@@ -46,3 +46,14 @@ CHOICES = (
     ("Yes", "yes"),
     ("No", "no"),
 )
+
+
+class Appointment(models.Model):
+    doctor = models.ForeignKey(Doctor,on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient,on_delete=models.CASCADE)
+    speciality = models.CharField(max_length=255)
+    appointment_date = models.DateField(null=True,blank=True)
+    appointment_time = models.TimeField(auto_now=False, auto_now_add=False,unique=True) 
+
+    def __str__(self):
+        return str(self.patient) + " -- " + str(self.doctor)

@@ -24,28 +24,27 @@
         }
     </style>
 
-    <title>Read Blogs</title>
+    <title>Dr. Page</title>
 </head>
 <body>
     
     <div class="container">
         <div class="jumbotron text-center">
-            <h1 class="text-primary">Welcome Patient!</h1>
-            <h3>Have a look at the blogs!</h3>
+            <h1 class="text-primary">Welcome Mr. {{patient.first_name}}!</h1>
+            <h3>Book the doctor you prefer</h3>
         </div>
     </div>
 
     
     <div class="container">
         <div class="row">
-            {% for i in blogs %}
+            {% for i in doctors %}
             <div class="col-sm-4">
                 <div class="card" style="width: 18rem;">
-                    <img class="card-img-top" src="{{i.image.url}}" alt="Card image cap" style="height:200px">
+                    <img class="card-img-top" src="{{i.profile_picture.url}}" alt="Card image cap" style="height:200px">
                     <div class="card-body">
-                      <h5 class="card-title">{{i.title}}</h5>
-                      <p class="card-text">{{i.summary}}</p>
-                      <a href="" class="btn btn-primary">READ</a>
+                      <h5 class="card-title">Dr. {{i.first_name}}</h5>
+                      <a href="{% url 'bookdoctor' patient.username i.id %}" class="btn btn-primary">BOOK</a>
                     </div>
                 </div>
             </div>

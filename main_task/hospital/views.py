@@ -1,9 +1,22 @@
+from datetime import datetime
+from datetime import timedelta
 import textwrap
 from django.shortcuts import redirect, render
 from .models import *
 from django.contrib.auth.models import User,auth
 from django.contrib import messages
+from google.oauth2 import service_account
+
+import os.path
+
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from apiclient.discovery import build
+from googleapiclient.errors import HttpError
 # Create your views here.
+
 
 def index(request):
     return render(request, 'index.html')
@@ -46,7 +59,6 @@ def patient_login(request):
         password = request.POST['password']
         patient = Patient.objects.filter(username=username).values()
         if(patient.exists()):
-            print(patient[0]['id'])
             if(username == patient[0]['username'] and password == patient[0]['password']):
                 username = patient[0]['username']
                 password = patient[0]['password']
@@ -55,10 +67,8 @@ def patient_login(request):
                 last_name = patient[0]['last_name']
                 profile_picture = patient[0]['profile_picture']
                 address = patient[0]['address']
-                pat_id = int(patient[0]['id'])
-                return render(request, 'patient.html',{"patient":patient,"pat_id":pat_id,"username":username,"first_name":first_name,
-                "email":email,"last_name":last_name,"profile_picture":profile_picture,
-                "address":address})
+                pat_id = str(patient[0]['id'])
+                return redirect("patient_main/" + pat_id )
             else:
                 messages.info(request,'Invalid credentials')
                 return render(request,'patient_login.html')
@@ -166,6 +176,27 @@ def doctor_main(request, id):
         doc = Doctor.objects.get(id=id) 
         return render(request, 'dr_main.html',{"doc":doc})
 
+def patient_main(request,id):
+    if request.method == 'POST':
+        patient = Patient.objects.get(id=id)
+        if(patient.exists()):
+            username = patient[0]['username']
+            password = patient[0]['password']
+            email = patient[0]['email']
+            first_name = patient[0]['first_name']
+            last_name = patient[0]['last_name']
+            profile_picture = patient[0]['profile_picture']
+            address = patient[0]['address']
+            patient_id = int(patient[0]['id'])
+            return render(request, 'patient_main.html',{"patient":patient,"patient_id":patient_id,"username":username,"password":password,
+            "email":email,"first_name":first_name,"last_name":last_name,"profile_picture":profile_picture,
+            "address":address})
+        else:
+            return render(request, 'patient_login.html')
+    else:
+        patient = Patient.objects.get(id=id)
+        return render(request, 'patient_main.html',{"patient":patient})
+
 
 def addblog(request,id):
     if request.method == 'POST':
@@ -217,6 +248,79 @@ def readblog(request):
         words = s.split()
         summary1 = " ".join(words[:15])
         summary = summary1 + "..."
-    return render(request,'readblog.html',{"blogs":blogs,"summary":summary})
+        i.summary = summary
+    return render(request,'readblog.html',{"blogs":blogs})
 
+def build_service(request):
+    
+    return service
+
+def doctorlist(request,user):
+    doctors = Doctor.objects.all()
+    patient = Patient.objects.get(username=user)
+    print(doctors)
+    return render(request,'drlist.html',{"doctors":doctors,"patient":patient})
+
+def bookdoctor(request,user,id):
+    doctor = Doctor.objects.get(id=id)
+    patient = Patient.objects.get(username=user)
+    SCOPES = ["https://www.googleapis.com/auth/calendar"]
+
+    service_account_email = "sahil.hate@somaiya.edu"
+    credentials = service_account.Credentials.from_service_account_file('calender-api-353319-14a9bea72c6e.json')
+    scoped_credentials = credentials.with_scopes(SCOPES)
+    calendarId = "c_classroom7b5889f1@group.calendar.google.com"
+
+    if request.method == 'POST':
+        speciality = request.POST['speciality']
+        appointment_date = request.POST['appointment_date']
+        appointment_time = request.POST['appointment_time']
+        
+
+        n=45
+        date_format_str = '%H:%M'
+        given_time = datetime.strptime(appointment_time, date_format_str)
+        final_time = given_time + timedelta(minutes=n)
+
+        final_time = final_time.strftime("%H:%M")
+        service = build("calendar", "v3", credentials=scoped_credentials)
+        result = service.calendarList().list().execute()
+        print(result)
+
+        event = (
+            service.events().insert(
+                calendarId=calendarId,
+                body={
+                    "summary": "Appointment for DR. doctor.username",
+                    "start": {"dateTime": appointment_time},
+                    "end": {"dateTime": final_time},
+                },
+            ).execute()
+        )
+
+        service = build_service(request)
+        events = (
+            service.events().list(
+                calendarId=calendarId,
+            ).execute()
+        )
+        for event in events['items']:
+            event_title = event['summary']
+            start_date_time = event["start"]["dateTime"]
+            end_date_time = event['end']["dateTime"]
+            booking_event.append([event_title, start_date_time, end_date_time])
+
+        appointment = Appointment.objects.create(doctor=doctor,patient=patient,
+        speciality=speciality,appointment_date=appointment_date,appointment_time=appointment_time)
+        appointment.save()
+        messages.info(request,'Appointment Successfull')
+        return render(request,'confirmation.html',{"doctor":doctor,"patient":patient,"speciality":speciality,
+        "appointment_date":appointment_date,"appointment_time":appointment_time, "final_time":final_time})
+    else:
+        return render(request,'bookdoctor.html',{"doctor":doctor,"patient":patient})
+
+def confirmation(request,user,id):
+    doctor = Doctor.objects.get(id=id)
+    patient = Patient.objects.get(username=user)
+    return render(request,'confirmation.html',{"doctor":doctor,"patient":patient})
 
