@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 class Doctor(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    profile_picture = models.FileField(upload_to=None,blank=True, null=True)
+    profile_picture = models.ImageField(upload_to="photos/",blank=True, null=True)
     username = models.CharField(max_length=255,unique=True)
     email = models.EmailField(max_length=255,unique=True)
     password = models.CharField(max_length=255)
@@ -31,7 +31,7 @@ class Patient(models.Model):
     
 class Blog(models.Model):
     title = models.CharField(max_length=255, unique=True)
-    image = models.ImageField(upload_to="images",null=True,blank=True)
+    image = models.ImageField(upload_to="images/",null=True,blank=True)
     category = models.CharField(max_length=255,null=True,blank=True)
     summary = models.CharField(max_length=255,null=True,blank=True)
     content = models.CharField(max_length=255,null=True,blank=True)

@@ -6,15 +6,13 @@ from .models import *
 from django.contrib.auth.models import User,auth
 from django.contrib import messages
 from google.oauth2 import service_account
-
-import os.path
-
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from apiclient.discovery import build
 from googleapiclient.errors import HttpError
+import os.path
+
 # Create your views here.
 
 
@@ -84,7 +82,7 @@ def dr_signup(request):
     if request.method == 'POST':
         first_name = request.POST['firstname'].strip()
         last_name = request.POST['lastname'].strip()
-        profile_picture = request.POST['ProfilePicture'].strip()
+        profile_picture = request.POST.get('ProfilePicture')
         username = request.POST['username'].strip()
         email = request.POST['email'].strip()
         password = request.POST['password'].strip()
@@ -118,7 +116,7 @@ def patient_signup(request):
     if request.method == 'POST':
         first_name = request.POST['firstname'].strip()
         last_name = request.POST['lastname'].strip()
-        profile_picture = request.POST['ProfilePicture'].strip()
+        profile_picture = request.POST.get('ProfilePicture')
         username = request.POST['username'].strip()
         email = request.POST['email'].strip()
         password = request.POST['password'].strip()
@@ -201,27 +199,26 @@ def patient_main(request,id):
 def addblog(request,id):
     if request.method == 'POST':
         if 'draft' in request.POST:
-            if 'Yes' == request.POST.get('draft'):
-                doc = Doctor.objects.get(id=id)
-                title = request.POST['title']
-                image = request.POST['image']
-                category = request.POST['category']
-                summary = request.POST['summary']
-                content = request.POST['content']
-                blog = Blog.objects.create(title=title,image=image,category=category,
-                summary=summary,content=content,doctor=doc,is_draft=True)
-                blog.save()
-                messages.info(request,'Draft saved')
-                return render(request,'addblog.html',{"doc":doc})
-        else:
             doc = Doctor.objects.get(id=id)
             title = request.POST['title']
-            image = request.POST['image']
+            image = request.POST.get('image')
             category = request.POST['category']
             summary = request.POST['summary']
             content = request.POST['content']
             blog = Blog.objects.create(title=title,image=image,category=category,
             summary=summary,content=content,doctor=doc,is_draft=True)
+            blog.save()
+            messages.info(request,'Draft saved')
+            return render(request,'addblog.html',{"doc":doc})
+        else:
+            doc = Doctor.objects.get(id=id)
+            title = request.POST['title']
+            image = request.POST.get('image')
+            category = request.POST['category']
+            summary = request.POST['summary']
+            content = request.POST['content']
+            blog = Blog.objects.create(title=title,image=image,category=category,
+            summary=summary,content=content,doctor=doc,is_draft=False)
             blog.save()
             messages.info(request,'Blog Uploaded Successfully!')
             return render(request,'addblog.html',{"doc":doc})
@@ -251,65 +248,51 @@ def readblog(request):
         i.summary = summary
     return render(request,'readblog.html',{"blogs":blogs})
 
-def build_service(request):
-    
-    return service
-
 def doctorlist(request,user):
     doctors = Doctor.objects.all()
     patient = Patient.objects.get(username=user)
     print(doctors)
     return render(request,'drlist.html',{"doctors":doctors,"patient":patient})
 
+
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
+service_account_email = "task-service-account@calender-api-353319.iam.gserviceaccount.com"
+credentials = service_account.Credentials.from_service_account_file('client_secret-final.json', scopes=SCOPES)
+scoped_credentials = credentials.with_scopes(SCOPES)
+
+def build_service():
+    service = build("calendar", "v3", credentials=scoped_credentials)
+    return service
+
+
 def bookdoctor(request,user,id):
     doctor = Doctor.objects.get(id=id)
     patient = Patient.objects.get(username=user)
-    SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
-    service_account_email = "sahil.hate@somaiya.edu"
-    credentials = service_account.Credentials.from_service_account_file('calender-api-353319-14a9bea72c6e.json')
-    scoped_credentials = credentials.with_scopes(SCOPES)
     calendarId = "c_classroom7b5889f1@group.calendar.google.com"
-
     if request.method == 'POST':
         speciality = request.POST['speciality']
         appointment_date = request.POST['appointment_date']
         appointment_time = request.POST['appointment_time']
-        
-
         n=45
         date_format_str = '%H:%M'
         given_time = datetime.strptime(appointment_time, date_format_str)
         final_time = given_time + timedelta(minutes=n)
-
         final_time = final_time.strftime("%H:%M")
-        service = build("calendar", "v3", credentials=scoped_credentials)
-        result = service.calendarList().list().execute()
-        print(result)
-
-        event = (
-            service.events().insert(
-                calendarId=calendarId,
-                body={
-                    "summary": "Appointment for DR. doctor.username",
-                    "start": {"dateTime": appointment_time},
-                    "end": {"dateTime": final_time},
-                },
-            ).execute()
-        )
-
-        service = build_service(request)
-        events = (
-            service.events().list(
-                calendarId=calendarId,
-            ).execute()
-        )
-        for event in events['items']:
-            event_title = event['summary']
-            start_date_time = event["start"]["dateTime"]
-            end_date_time = event['end']["dateTime"]
-            booking_event.append([event_title, start_date_time, end_date_time])
-
+        
+        # service = build_service()
+        # event = (
+        #     service.events().insert(
+        #         calendarId=calendarId,
+        #         body={
+        #             "summary": "Appointment for DR. doctor.username",
+        #             "start": {"dateTime": appointment_time.isoformat()},
+        #             "end": {"dateTime": final_time.isoformat()},
+        #         },
+        #     ).execute()
+        # )
+        # print(event)
+        
         appointment = Appointment.objects.create(doctor=doctor,patient=patient,
         speciality=speciality,appointment_date=appointment_date,appointment_time=appointment_time)
         appointment.save()
